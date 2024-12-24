@@ -16,7 +16,7 @@ To-Do List Application with Local Storage
 Project Objective:
 
 The To-Do List Application with Local Storage project is a web-based application that allows users to create, read, update, and delete (CRUD) tasks. The application uses local storage to persist tasks between sessions.The application will be built using HTMl,CSS,and JavaScript, and will Utilize local Storage for data persistence.
-
+![Screenshot (308)](https://github.com/user-attachments/assets/0368f845-4e88-4a73-8654-8223051441b7)
 Project Goals:
 
 - Create a user-friendly interface for creating, reading, updating, and deleting tasks
