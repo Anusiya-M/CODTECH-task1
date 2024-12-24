@@ -1,0 +1,207 @@
+/*HTML: 
+      The HTML code creates a basic web page structure with a form for adding new todo tasks, a list for displaying existing tasks, and buttons for deleteing tasks. */
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="stylesheet" href="style.css">
+    <title>Todo List</title>
+</head>
+<body>
+    <header>
+        <h1>ToDo - List</h1>
+        <nav>
+            <ul>
+               <li><a href="">Home</a></li>
+               <li><a href="">About</a></li>
+               <li><a href="">Services</a></li>
+               <li><a href="">Contact</a></li>
+               <li><a href="">Login</a></li>
+            </ul>
+        </nav>
+    </header>
+    <h1>Todo List</h1>
+    <form action="" id="todo-form">
+        <input type="text" id="todo-input" placeholder="Enter Todo Task">
+        <input type="datetime-local" id="todo-time" placeholder="set reminder time">
+        <button id="todo-btn">Add Todo</button>
+    </form>
+    <ul id="todo-list"></ul>
+    <script src="sample.js">
+
+    </script>
+    <footer>
+        <p>&copy; 2024 mytodolistwebsite</p>
+    </footer>
+</body>
+</html>
+
+
+/*CSS: 
+      The CSS code styles the web page with basic layout, colors, and typography.*/
+
+body{
+    font-family: Arial, Helvetica, sans-serif;
+    text-align: center;
+    background-color: aquamarine;
+}
+header{
+    display: flex;
+    width: 100%;
+    justify-content: space-between;
+    padding: 1rem;
+    align-items: center;
+    font-family: 'Trebuchet MS', 'Lucida Sans Unicode', 'Lucida Grande', 'Lucida Sans', Arial, sans-serif;
+}
+header h1{
+    font-size: 1.5rem;
+    text-transform: uppercase;
+    color: black;
+    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+}
+header nav ul{
+    list-style: none;
+    display: flex;
+    padding: 0;
+    margin: 0;
+}
+header nav ul li{
+    margin-right: 20px;
+    font-size: 1.5rem;
+}
+header nav a{
+    text-decoration: none;
+    color: black;
+}
+header nav a:hover{
+    color:red;
+}
+#todo-form{
+    margin-bottom: 20px;
+}
+#todo-input{
+    padding: 10px;
+    border-radius: 5px;
+    font-size: 16px;
+    border: 1px solid #ccc;
+}
+#todo-time{
+    padding: 10px;
+    border-radius: 5px;
+    font-size: 16px;
+    border: 1px solid #ccc;
+}
+#todo-btn{
+    background-color: #4caf50;
+    color: #fff;
+    padding: 10px 20px;
+    border: none;
+    border-radius: 5px;
+    cursor: pointer;
+}
+#todo-btn:hover{
+    background-color: #3e8e41;
+}
+#todo-list{
+    padding: 0;
+    margin: 0;
+    list-style: none;
+    text-transform: capitalize;
+}
+#todo-list li{
+    padding: 10px;
+    border-bottom: 1px solid #ccc;
+}
+#todo-list li:last-child{
+    border-bottom: none;
+}
+.error{
+    color: #f00;
+    font-weight: bold;
+}
+footer{
+    background-color: #333;
+    color: #fff;
+    padding: 10px;
+    text-align: center;
+    clear: both;
+    width: auto;
+}
+footer p{
+    font-size: 14px;
+    margin-bottom: 10px;
+}
+
+/*JAVASCRIPT:
+            The JavaScript code adds interactivity to the web page by:
+               -Handling form submissions to add new todo tasks.
+               -Displaying existing todo tasks in the list.
+               -Deleting tasks when the delete button is clicked.
+               -Storing todo tasks in local storage.*/
+
+let todoList = [];
+const todoForm=document.getElementById('todo-form');
+const todoInput=document.getElementById('todo-input');
+const todoTime=document.getElementById('todo-time');
+const todoListElement=document.getElementById('todo-list');
+
+todoForm.addEventListener('submit', (e)=>{
+    e.preventDefault();
+    const todoTask = todoInput.value.trim();
+    const todoReminderTime = todoTime.value;
+    if (todoTask && todoReminderTime) {
+        const todoItem={
+            task: todoTask,
+            reminderTime: todoReminderTime,
+            status:'pending'
+        };
+        todoList.push(todoItem);
+        localStorage.setItem('todoList', JSON.stringify(todoList));
+
+        displayTodoList();
+        todoInput.value='';
+        todoTime.value='';
+    }
+});
+function displayTodoList(){
+    todoListElement.innerHTML='';
+    todoList.forEach((todoItem, index)=>{
+        const todoListItem=document.createElement('li');
+
+        todoListItem.textContent=`${todoItem.task} -${todoItem.reminderTime}-${todoItem.status}`;
+
+        const deleteButton=document.createElement('button');
+        deleteButton.textContent='Delete';
+        deleteButton.addEventListener('click',()=>{
+            todoList.splice(index,1);
+            localStorage.setItem('todoList', JSON.stringify(todoList));
+            displayTodoList();
+        });
+        todoListItem.appendChild(deleteButton);
+        todoListElement.appendChild(todoListItem);
+        checkReminderTime(todoItem, index);
+    });
+}
+function checkReminderTime(todoItem, index){
+    const reminderTime = new Date(todoItem.reminderTime);
+    const currentTime = new Date();
+    if (currentTime>=reminderTime) {
+        todoItem.status = 'missed';
+        todoList[index] = todoItem;
+        localStorage.setItem('todoList', JSON.stringify(todoList));
+        displayTodoList();
+        const errorElement=document.createElement('p');
+        errorElement.textContent=`you missed the task: ${todoItem.task}!`;
+        errorElement.classList.add('error');
+        todoListElement.appendChild(errorElement);
+    }
+}
+window.addEventListener('load',()=>{
+    const storedTodoList=localStorage.getItem('todoList');
+    if (storedTodoList) {
+        todoList= JSON.parse(storedTodoList);
+        displayTodoList();
+    }
+});
